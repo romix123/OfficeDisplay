@@ -13,7 +13,7 @@
 
     
 */
-const int FW_VERSION = 100;
+const int FW_VERSION = 102;
 
 
 #include <SPI.h>
@@ -85,12 +85,12 @@ struct UserStruct
 //const String botToken = "835419670:AAEeYWW1SyQtnIrI3wF060D_mrmFTJQHK-0";
 String botToken;
 
-const char* fwUrlBase = "https://github.com/romix123/OfficeDisplay";  // location of the firmware for OTA update
+const char* fwUrlBase = "https://github.com/romix123/OfficeDisplay/";  // location of the firmware for OTA update
 
 String occupantS1; // = "Dr. Martin Husovec";
-String occupantS2 = "Dr. Francisco Costa Cabral";
+String occupantS2;// = "Dr. Francisco Costa Cabral";
 String ownerS1;// = "Martin";
-String ownerS2 = "Francisco";
+String ownerS2; //= "Francisco";
 String bossS = "Romix";
 /*
  * 
@@ -274,8 +274,12 @@ void checkForUpdates() {
  // String mac = getMAC();
   String fwURL = String( fwUrlBase );
   fwURL.concat( "OfficeDisplay" );
-  String fwVersionURL = fwURL;
-  fwVersionURL.concat( ".version" );
+
+  //https://raw.githubusercontent.com/romix123/OfficeDisplay/master/OfficeDisplay.version
+//  String fwVersionURL = fwURL;
+//  fwVersionURL.concat( ".version" );
+
+String  fwVersionURL = "https://raw.githubusercontent.com/romix123/OfficeDisplay/master/OfficeDisplay.version";
 
   Serial.println( "Checking for firmware updates." );
  
@@ -298,8 +302,9 @@ void checkForUpdates() {
     if( newVersion > FW_VERSION ) {
       Serial.println( "Preparing to update" );
 
-      String fwImageURL = fwURL;
-      fwImageURL.concat( ".bin" );
+      String fwImageURL = "https://github.com/romix123/OfficeDisplay/raw/master/OfficeDisplay.bin"; //fwURL;
+  //    fwImageURL.concat( ".bin" );
+     
       t_httpUpdate_return ret = ESPhttpUpdate.update( fwImageURL );
 
       switch(ret) {
