@@ -9,10 +9,11 @@
     Jörn Schlingensiepen <joern@schlingensiepen.com>
     Client's API:   https://schlingensiepen.github.io/TelegramBotClient/
     Telegram's API: https://core.telegram.org/bots/api
+    OTA update: https://www.bakke.online/index.php/2017/06/02/self-updating-ota-firmware-for-esp8266/
 
     
 */
-const int FW_VERSION = 1;
+const int FW_VERSION = 100;
 
 
 #include <SPI.h>
@@ -84,7 +85,7 @@ struct UserStruct
 //const String botToken = "835419670:AAEeYWW1SyQtnIrI3wF060D_mrmFTJQHK-0";
 String botToken;
 
-const char* fwUrlBase = "http://ronaldleenes.nl/OfficeDisplay";  // location of the firmware for OTA update
+const char* fwUrlBase = "https://github.com/romix123/OfficeDisplay";  // location of the firmware for OTA update
 
 String occupantS1; // = "Dr. Martin Husovec";
 String occupantS2 = "Dr. Francisco Costa Cabral";
@@ -105,23 +106,23 @@ ESP8266WiFiMulti WiFiMulti;
  * end update
  */
 
-#include "Info.h"
+#include "icons/Info.h"
 
- #include "home.h"
- #include "sport.h"
- #include "meeting.h"
- #include "busy.h"
- #include "confcallF.h"
- #include "confcallM.h"
+ #include "icons/home.h"
+ #include "icons/sport.h"
+ #include "icons/meeting.h"
+ #include "icons/busy.h"
+ #include "icons/confcallF.h"
+ #include "icons/confcallM.h"
 // #include "teach.h"
- #include "faq.h"
- #include "globe.h"
- #include "sick.h"
+ #include "icons/faq.h"
+ #include "icons/globe.h"
+ #include "icons/sick.h"
  
 
- #include "cursors.h"
- #include "splash.h"
- #include "splash285x43.h"
+ #include "icons/cursors.h"
+ #include "icons/splash.h"
+ #include "icons/splash285x43.h"
 
  #include "utils.h"
  #include "display.h"
@@ -196,14 +197,19 @@ void onReceive (TelegramProcessError tbcErr, JwcProcessError jwcErr, Message* ms
   }else if (getValue(msg->Text, ' ',1) == "wipe") {
       ZeroFillFlash();
   } else if (getValue(msg->Text, ' ',1) == "update") {
-   // update();
-  }
+      checkForUpdates();  
+      }
       client.postMessage(msg->ChatId, msg->Text); 
   return;
  }
  
  if (msg->Text.startsWith("~icons")) {
   client.postMessage(msg->ChatId, "home, busy, travel, teach, sick, telco, meeting, welcome, sport"); 
+  return;
+ }
+  
+ if (msg->Text.startsWith("~?")) {
+  client.postMessage(msg->ChatId, "bot, occupant1, occupant2, owner1, owner2, done, wipe, update"); 
   return;
  }
      
@@ -267,7 +273,7 @@ void onError (TelegramProcessError tbcErr, JwcProcessError jwcErr)
 void checkForUpdates() {
  // String mac = getMAC();
   String fwURL = String( fwUrlBase );
-//  fwURL.concat( mac );
+  fwURL.concat( "OfficeDisplay" );
   String fwVersionURL = fwURL;
   fwVersionURL.concat( ".version" );
 
